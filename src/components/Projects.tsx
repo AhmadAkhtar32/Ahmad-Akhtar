@@ -11,6 +11,7 @@ const PROJECTS = [
     title: "Itinera — AI-Powered Trip Planner",
     desc: "Final year project: AI-powered trip planner that designs full-stack itineraries with Next.js, Convex, Clerk Auth, and GPT-4. Integrated Mapbox and real-time data sync.",
     tags: ["Next.js", "Convex", "Clerk Auth", "GPT-4", "Mapbox"],
+    links: [],
     year: "2025 — 2026",
     color: "#22c3e6",
   },
