@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { Award, BookOpen, BrainCircuit, Code2, GraduationCap, MapPin } from "lucide-react";
 import { Counter, Reveal, SectionTag } from "@/components/ui";
-import portrait from "@/assets/portraits.jpg";
+import portrait from "@/assets/portrait.png";
 
 const PARAGRAPH =
   "I'm a software engineer who turns ideas into scalable, user-focused applications. I specialize in React, Next.js, and Python, with a strong foundation in data structures, algorithms, and AI. I love building products that solve real problems — whether it's a personal project or a full-stack web app.";
