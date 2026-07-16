@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Clock, Mail, MapPin, Send } from "lucide-react";
+import emailjs from "@emailjs/browser";
 import { Magnetic, Reveal } from "@/components/ui";
 
 const CONTACT_ROWS = [
@@ -54,22 +55,36 @@ function InstagramIcon({ className }: { className?: string }) {
 const inputClass =
   "w-full rounded-xl border border-line bg-mist px-4 py-3.5 text-sm text-ink placeholder:text-ink-soft/60 outline-none transition-all duration-300 focus:border-aqua focus:bg-paper focus:ring-4 focus:ring-aqua/10";
 
+// ⚠️ Replace these two with your actual values from the EmailJS dashboard.
+const EMAILJS_SERVICE_ID = "service_hs1cq6e";
+const EMAILJS_TEMPLATE_ID = "template_havoysc";
+const EMAILJS_PUBLIC_KEY = "oB9waspWO7t5TvwF3";
+
 export default function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const name = String(data.get("name") || "");
-    const email = String(data.get("email") || "");
-    const message = String(data.get("message") || "");
-    const subject = encodeURIComponent(`New message from ${name}`);
-    const body = encodeURIComponent(
-      `Hi Ahmad,\n\n${message}\n\n— ${name}\n${email}`
-    );
-    window.location.href = `mailto:ahmadrao3226@gmail.com?subject=${subject}&body=${body}`;
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
+    const form = e.currentTarget;
+    setSending(true);
+    setError(false);
+
+    emailjs
+      .sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form, EMAILJS_PUBLIC_KEY)
+      .then(() => {
+        setSent(true);
+        form.reset();
+        setTimeout(() => setSent(false), 4000);
+      })
+      .catch((err) => {
+        console.error("EmailJS error:", err);
+        setError(true);
+      })
+      .finally(() => {
+        setSending(false);
+      });
   };
 
   return (
@@ -183,13 +198,23 @@ export default function Contact() {
                   <Magnetic className="block w-full">
                     <button
                       type="submit"
-                      className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-aqua via-leaf to-coral px-7 py-4 text-sm font-semibold text-white shadow-xl shadow-aqua/30 transition-shadow duration-300 hover:shadow-2xl"
+                      disabled={sending}
+                      className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-aqua via-leaf to-coral px-7 py-4 text-sm font-semibold text-white shadow-xl shadow-aqua/30 transition-shadow duration-300 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                      {sent ? "Opening your email app..." : "Send Message"}
+                      {sending ? "Sending..." : sent ? "Message sent!" : "Send Message"}
                       <Send className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
                     </button>
                   </Magnetic>
+                  {error && (
+                    <p className="text-center text-sm font-medium text-red-500">
+                      Something went wrong. Please try again or email me directly at{" "}
+                      <a href="mailto:ahmadrao3226@gmail.com" className="underline">
+                        ahmadrao3226@gmail.com
+                      </a>
+                      .
+                    </p>
+                  )}
                 </form>
               </div>
             </div>
