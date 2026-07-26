@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, X, GripVertical, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, X, GripVertical, ExternalLink, ImagePlus, Loader2 } from "lucide-react";
 import { Reveal, SectionTag } from "@/components/ui";
 import {
   subscribeToProjects,
@@ -10,6 +10,7 @@ import {
   deleteProject,
 } from "@/lib/firestore-projects";
 import type { Project, ProjectInput } from "@/lib/firestore-projects";
+import { uploadProjectImage } from "@/lib/storage";
 
 const EMPTY_FORM: ProjectInput = {
   image: "",
@@ -34,6 +35,10 @@ export default function AdminProjects() {
   const [tagsText, setTagsText] = useState("");
   const [links, setLinks] = useState<{ label: string; href: string }[]>([]);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageError, setImageError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsub = subscribeToProjects((data) => {
@@ -48,6 +53,8 @@ export default function AdminProjects() {
     setForm({ ...EMPTY_FORM, order: projects.length });
     setTagsText("");
     setLinks([]);
+    setImagePreview("");
+    setImageError("");
     setShowForm(true);
   };
 
@@ -56,13 +63,52 @@ export default function AdminProjects() {
     setForm(p);
     setTagsText(p.tags.join(", "));
     setLinks(p.links);
+    setImagePreview(p.image);
+    setImageError("");
     setShowForm(true);
   };
 
   const closeForm = () => setShowForm(false);
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageError("");
+
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please choose an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("Image must be under 5MB.");
+      return;
+    }
+
+    // instant local preview while it uploads
+    const localPreview = URL.createObjectURL(file);
+    setImagePreview(localPreview);
+    setUploading(true);
+
+    try {
+      const url = await uploadProjectImage(file);
+      setForm((f) => ({ ...f, image: url }));
+      setImagePreview(url);
+    } catch (err) {
+      console.error(err);
+      setImageError("Upload failed. Please try again.");
+      setImagePreview(form.image);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
+    if (!form.image) {
+      setImageError("Please upload an image.");
+      return;
+    }
     setSaving(true);
     const payload: ProjectInput = {
       ...form,
@@ -121,9 +167,7 @@ export default function AdminProjects() {
 
       {/* List */}
       <div className="mt-10 space-y-4">
-        {loading && (
-          <p className="text-sm text-ink-soft">Loading projects...</p>
-        )}
+        {loading && <p className="text-sm text-ink-soft">Loading projects...</p>}
         {!loading && projects.length === 0 && (
           <div className="rounded-[1.75rem] border border-dashed border-line bg-paper/60 p-10 text-center text-sm text-ink-soft">
             No projects yet — click "Add Project" to create your first one.
@@ -139,14 +183,10 @@ export default function AdminProjects() {
               className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-mist"
               style={{ boxShadow: `0 0 0 2px ${p.color}33` }}
             >
-              {p.image && (
-                <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
-              )}
+              {p.image && <img src={p.image} alt={p.title} className="h-full w-full object-cover" />}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-base font-semibold tracking-tight">
-                {p.title}
-              </p>
+              <p className="truncate font-display text-base font-semibold tracking-tight">{p.title}</p>
               <p className="mt-0.5 truncate text-xs text-ink-soft">{p.desc}</p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {p.tags.slice(0, 4).map((t) => (
@@ -211,6 +251,38 @@ export default function AdminProjects() {
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div>
+                  <label className="text-xs font-semibold text-ink-soft">Project image</label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="mt-1.5 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-line bg-mist transition-colors hover:border-aqua"
+                  >
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2 text-ink-soft">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                        <span className="text-xs font-medium">Uploading...</span>
+                      </div>
+                    ) : imagePreview ? (
+                      <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-ink-soft">
+                        <ImagePlus className="h-6 w-6" />
+                        <span className="text-xs font-medium">Click to upload from your computer</span>
+                        <span className="text-[11px] text-ink-soft/60">JPG or PNG, up to 5MB</span>
+                      </div>
+                    )}
+                  </button>
+                  {imageError && <p className="mt-1.5 text-xs font-medium text-red-500">{imageError}</p>}
+                </div>
+
+                <div>
                   <label className="text-xs font-semibold text-ink-soft">Title</label>
                   <input
                     required
@@ -229,17 +301,6 @@ export default function AdminProjects() {
                     value={form.desc}
                     onChange={(e) => setForm({ ...form, desc: e.target.value })}
                     className={`${inputClass} mt-1.5 resize-none`}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-ink-soft">Image URL</label>
-                  <input
-                    required
-                    value={form.image}
-                    onChange={(e) => setForm({ ...form, image: e.target.value })}
-                    placeholder="https://..."
-                    className={`${inputClass} mt-1.5`}
                   />
                 </div>
 
@@ -266,9 +327,7 @@ export default function AdminProjects() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-ink-soft">
-                    Tags (comma separated)
-                  </label>
+                  <label className="text-xs font-semibold text-ink-soft">Tags (comma separated)</label>
                   <input
                     value={tagsText}
                     onChange={(e) => setTagsText(e.target.value)}
@@ -279,9 +338,7 @@ export default function AdminProjects() {
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-ink-soft">
-                      Links (optional)
-                    </label>
+                    <label className="text-xs font-semibold text-ink-soft">Links (optional)</label>
                     <button
                       type="button"
                       onClick={() => setLinks([...links, { label: "", href: "" }])}
@@ -332,7 +389,7 @@ export default function AdminProjects() {
 
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || uploading}
                   className="mt-2 w-full rounded-full bg-gradient-to-r from-aqua via-leaf to-coral px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {saving ? "Saving..." : editingId ? "Save Changes" : "Create Project"}
