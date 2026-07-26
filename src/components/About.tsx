@@ -6,7 +6,7 @@ import { Counter, Reveal, SectionTag } from "@/components/ui";
 import portrait from "@/assets/portrait.png";
 
 const PARAGRAPH =
-  "I'm a software engineer who turns ideas into scalable, user-focused applications. I specialize in React, Next.js, and Python, with a strong foundation in data structures, algorithms, and AI. I love building products that solve real problems — whether it's a personal project or a full-stack web app.";
+  "I'm a software engineer who turns ideas into scalable, user-focused applications. I specialize in React, Next.js, and Python, with a strong foundation in data structures, algorithms, and AI. I love building products that solve real problems whether it's a personal project or a full-stack web app.";
 
 const STATS = [
   { icon: Code2, value: 2, suffix: "+", decimals: 0, label: "Years of Coding", color: "#22c3e6" },
