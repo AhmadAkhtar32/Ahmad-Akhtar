@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Portfolio from "@/pages/Portfolio";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminComingSoon from "@/pages/AdminComingSoon";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/lib/ProtectedRoute";
@@ -21,10 +22,7 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
-        <Route
-          path="projects"
-          element={<AdminComingSoon title="Projects" color="#22c3e6" />}
-        />
+        <Route path="projects" element={<AdminProjects />} />
         <Route
           path="skills"
           element={<AdminComingSoon title="Skills" color="#14b86a" />}
