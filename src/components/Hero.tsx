@@ -98,7 +98,7 @@ export default function Hero({ active }: { active: boolean }) {
             variants={fadeUp}
             className="mt-7 max-w-xl text-base leading-relaxed text-ink-soft md:text-lg"
           >
-            I&apos;m Ahmad Akhtar — a software engineer from Lahore, Pakistan. I build
+            I&apos;m Ahmad Akhtar a software engineer from Lahore, Pakistan. I build
             scalable applications, AI-powered tools, and explore machine learning. Currently
             studying Computer Science at COMSATS University.
           </motion.p>
