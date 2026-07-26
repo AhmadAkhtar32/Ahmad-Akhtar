@@ -94,9 +94,7 @@ export default function About() {
               </p>
 
               <p className="relative mt-5 text-[15px] leading-relaxed text-ink-soft">
-                Computer Science graduate from COMSATS University (Sahiwal Campus), software engineer,
-                and AI/ML enthusiast. I build scalable applications, automate workflows, and explore
-                machine learning with Python and modern frameworks.
+                Computer Science graduate from COMSATS University with a passion for Software Engineering and AI/ML. I specialize in building scalable applications, automating workflows, and developing intelligent solutions using Python and modern frameworks.
               </p>
 
               <div className="relative mt-7 flex flex-wrap gap-2">
