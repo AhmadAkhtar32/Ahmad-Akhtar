@@ -1,32 +1,23 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Code2 } from "lucide-react";
-import workItinera from "@/assets/work-itinera.jpg";
-import workAiTrip from "@/assets/work-ai-trip.jpg";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal, SectionTag } from "@/components/ui";
 import { scrollToSection } from "@/lib/lenis";
-
-const PROJECTS = [
-  {
-    image: workItinera,
-    title: "Itinera — AI-Powered Trip Planner",
-    desc: "Final year project: AI-powered trip planner that designs full-stack itineraries with Next.js, Convex, Clerk Auth, and GPT-4. Integrated Mapbox and real-time data sync.",
-    tags: ["Next.js", "Convex", "Clerk Auth", "GPT-4", "Mapbox"],
-    links: [],
-    year: "2025 — 2026",
-    color: "#22c3e6",
-  },
-  {
-    image: workAiTrip,
-    title: "AI Trip Planner",
-    desc: "Personal project: AI trip planner built with React and Firebase. Implemented core planning features with a responsive UI and real-time database sync.",
-    tags: ["React", "Firebase", "Tailwind CSS", "AI"],
-    links: [],
-    year: "2024",
-    color: "#14b86a",
-  },
-];
+import { subscribeToProjects } from "@/lib/firestore-projects";
+import type { Project } from "@/lib/firestore-projects";
 
 export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeToProjects((data) => {
+      setProjects(data);
+      setLoading(false);
+    });
+    return unsub;
+  }, []);
+
   return (
     <section id="projects" className="relative overflow-hidden py-24 md:py-36">
       <div className="pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-leaf/15 blur-[120px]" />
@@ -51,9 +42,13 @@ export default function Projects() {
           </Reveal>
         </div>
 
+        {!loading && projects.length === 0 && (
+          <p className="mt-16 text-sm text-ink-soft">Projects coming soon.</p>
+        )}
+
         <div className="mt-16 grid gap-8 md:grid-cols-2">
-          {PROJECTS.map((project, i) => (
-            <Reveal key={project.title} delay={0.08 * i} className={i % 2 === 1 ? "md:mt-16" : ""}>
+          {projects.map((project, i) => (
+            <Reveal key={project.id} delay={0.08 * i} className={i % 2 === 1 ? "md:mt-16" : ""}>
               <div className="group" data-hover>
                 <div className="relative overflow-hidden rounded-[1.75rem] border border-line bg-paper shadow-[0_20px_60px_rgba(11,11,20,0.07)]">
                   <div className="relative aspect-[4/3] overflow-hidden">
@@ -74,7 +69,7 @@ export default function Projects() {
                       className="absolute left-5 top-5 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-lg backdrop-blur-sm"
                       style={{ background: `${project.color}e6` }}
                     >
-                      {i === 0 ? "Final Year Project" : "Personal Project"}
+                      {i === 0 ? "Featured Project" : "Project"}
                     </span>
                     {project.links.length > 0 && (
                       <motion.span
@@ -93,7 +88,7 @@ export default function Projects() {
                       {project.title.split(" — ")[0]}
                     </p>
                     <h3 className="mt-1.5 font-display text-2xl font-semibold tracking-tight transition-colors duration-300 md:text-[1.7rem]">
-                      {project.title.split(" — ")[1]}
+                      {project.title.split(" — ")[1] ?? ""}
                     </h3>
                     <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{project.desc}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -123,9 +118,8 @@ export default function Projects() {
                         className="group/link flex items-center gap-2 rounded-full border border-line bg-mist px-4 py-2 text-xs font-semibold transition-all duration-300 hover:border-aqua hover:bg-aqua hover:text-white"
                         data-hover
                       >
-                        <link.icon className="h-3 w-3" />
-                        {link.label}
                         <ArrowUpRight className="h-3 w-3 transition-transform duration-300 group-hover/link:rotate-45" />
+                        {link.label}
                       </a>
                     ))}
                   </div>
