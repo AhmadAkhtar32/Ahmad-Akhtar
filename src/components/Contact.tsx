@@ -90,9 +90,9 @@ export default function Contact() {
   };
 
   const CONTACT_ROWS = [
-    { icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
-    { icon: MapPin, label: contact.location, href: undefined },
-    { icon: Clock, label: contact.replyTime, href: undefined },
+    { id: "email", icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
+    { id: "location", icon: MapPin, label: contact.location, href: undefined },
+    { id: "replyTime", icon: Clock, label: contact.replyTime, href: undefined },
   ];
 
   return (
@@ -152,11 +152,11 @@ export default function Contact() {
                       </>
                     );
                     return row.href ? (
-                      <a key={row.label} href={row.href} className="group flex w-fit items-center gap-4" data-hover>
+                      <a key={row.id} href={row.href} className="group flex w-fit items-center gap-4" data-hover>
                         {inner}
                       </a>
                     ) : (
-                      <div key={row.label} className="group flex w-fit items-center gap-4">
+                      <div key={row.id} className="group flex w-fit items-center gap-4">
                         {inner}
                       </div>
                     );
@@ -164,7 +164,7 @@ export default function Contact() {
                 </div>
 
                 <div className="mt-10 flex gap-3">
-                  {contact.socials.map(({ label, href, icon }) => {
+                  {contact.socials.map(({ label, href, icon }, i) => {
                     const Icon =
                       icon === "github"
                         ? GithubIcon
@@ -174,7 +174,7 @@ export default function Contact() {
                         ? FacebookIcon
                         : InstagramIcon;
                     return (
-                      <Magnetic key={label} strength={0.4}>
+                      <Magnetic key={`${icon}-${i}`} strength={0.4}>
                         <a
                           href={href}
                           target="_blank"
