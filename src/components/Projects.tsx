@@ -5,6 +5,7 @@ import { Reveal, SectionTag } from "@/components/ui";
 import { scrollToSection } from "@/lib/lenis";
 import { subscribeToProjects } from "@/lib/firestore-projects";
 import type { Project } from "@/lib/firestore-projects";
+import { lenisRef } from "@/lib/lenis";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -14,6 +15,9 @@ export default function Projects() {
     const unsub = subscribeToProjects((data) => {
       setProjects(data);
       setLoading(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => lenisRef.current?.resize?.());
+      });
     });
     return unsub;
   }, []);

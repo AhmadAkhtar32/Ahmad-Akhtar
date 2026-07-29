@@ -6,6 +6,7 @@ import { Counter, Reveal, SectionTag } from "@/components/ui";
 import { subscribeToAbout, DEFAULT_ABOUT } from "@/lib/firestore-about";
 import type { AboutContent } from "@/lib/firestore-about";
 import { ICON_MAP } from "@/lib/icon-map";
+import { lenisRef } from "@/lib/lenis";
 
 function Word({
   progress,
@@ -38,6 +39,12 @@ export default function About() {
     const unsub = subscribeToAbout((data) => {
       setAbout(data);
       setLoading(false);
+      // Content just changed the page's height — tell Lenis to
+      // re-measure so scroll-linked animations stay in sync.
+      // Double rAF ensures the new DOM has actually painted first.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => lenisRef.current?.resize?.());
+      });
     });
     return unsub;
   }, []);
