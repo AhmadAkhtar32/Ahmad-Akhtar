@@ -3,6 +3,7 @@ import { motion, useScroll } from "framer-motion";
 import { Reveal, SectionTag } from "@/components/ui";
 import { subscribeToSkills } from "@/lib/firestore-skills";
 import type { Stack } from "@/lib/firestore-skills";
+import { lenisRef } from "@/lib/lenis";
 import { ICON_MAP } from "@/lib/icon-map";
 
 export default function Skills() {
@@ -18,6 +19,9 @@ export default function Skills() {
     const unsub = subscribeToSkills((data) => {
       setStacks(data);
       setLoading(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => lenisRef.current?.resize?.());
+      });
     });
     return unsub;
   }, []);
