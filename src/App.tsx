@@ -5,7 +5,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProjects from "@/pages/admin/AdminProjects";
 import AdminSkills from "@/pages/admin/AdminSkills";
 import AdminAbout from "@/pages/admin/AdminAbout";
-import AdminComingSoon from "@/pages/AdminComingSoon";
+import AdminContact from "@/pages/admin/AdminContact";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/lib/ProtectedRoute";
 
@@ -27,10 +27,7 @@ export default function App() {
         <Route path="projects" element={<AdminProjects />} />
         <Route path="skills" element={<AdminSkills />} />
         <Route path="about" element={<AdminAbout />} />
-        <Route
-          path="contact"
-          element={<AdminComingSoon title="Contact" color="#e14dcb" />}
-        />
+        <Route path="contact" element={<AdminContact />} />
       </Route>
     </Routes>
   );
