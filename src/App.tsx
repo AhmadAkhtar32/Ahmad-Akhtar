@@ -3,6 +3,7 @@ import Portfolio from "@/pages/Portfolio";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProjects from "@/pages/admin/AdminProjects";
+import AdminSkills from "@/pages/admin/AdminSkills";
 import AdminComingSoon from "@/pages/AdminComingSoon";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProtectedRoute from "@/lib/ProtectedRoute";
@@ -23,10 +24,7 @@ export default function App() {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="projects" element={<AdminProjects />} />
-        <Route
-          path="skills"
-          element={<AdminComingSoon title="Skills" color="#14b86a" />}
-        />
+        <Route path="skills" element={<AdminSkills />} />
         <Route
           path="about"
           element={<AdminComingSoon title="About" color="#ff6b4a" />}
