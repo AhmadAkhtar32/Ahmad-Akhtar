@@ -1,22 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Clock, Mail, MapPin, Send } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { Magnetic, Reveal } from "@/components/ui";
-
-const CONTACT_ROWS = [
-  { icon: Mail, label: "ahmadrao3226@gmail.com", href: "mailto:ahmadrao3226@gmail.com" },
-  { icon: MapPin, label: "Lahore, Pakistan", href: undefined },
-  { icon: Clock, label: "Replies within 24 hours", href: undefined },
-];
-
-const SOCIALS = [
-  { label: "GitHub", href: "https://github.com/AhmadAkhtar32", icon: "github" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/ahmad-akhtar-2065532aa/", icon: "linkedin" },
-  { label: "Facebook", href: "https://web.facebook.com/profile.php?id=100026754934500", icon: "facebook" },
-  { label: "Instagram", href: "https://www.instagram.com/ahmad_rao_32/", icon: "instagram" },
-];
+import { subscribeToContact, DEFAULT_CONTACT } from "@/lib/firestore-contact";
+import type { ContactContent } from "@/lib/firestore-contact";
+import { lenisRef } from "@/lib/lenis";
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -55,15 +45,27 @@ function InstagramIcon({ className }: { className?: string }) {
 const inputClass =
   "w-full rounded-xl border border-line bg-mist px-4 py-3.5 text-sm text-ink placeholder:text-ink-soft/60 outline-none transition-all duration-300 focus:border-aqua focus:bg-paper focus:ring-4 focus:ring-aqua/10";
 
-// ⚠️ Replace these two with your actual values from the EmailJS dashboard.
 const EMAILJS_SERVICE_ID = "service_hs1cq6e";
 const EMAILJS_TEMPLATE_ID = "template_havoysc";
 const EMAILJS_PUBLIC_KEY = "oB9waspWO7t5TvwF3";
 
 export default function Contact() {
+  const [contact, setContact] = useState<ContactContent>(DEFAULT_CONTACT);
+  const [loading, setLoading] = useState(true);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const unsub = subscribeToContact((data) => {
+      setContact(data);
+      setLoading(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => lenisRef.current?.resize?.());
+      });
+    });
+    return unsub;
+  }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,12 +89,21 @@ export default function Contact() {
       });
   };
 
+  const CONTACT_ROWS = [
+    { icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
+    { icon: MapPin, label: contact.location, href: undefined },
+    { icon: Clock, label: contact.replyTime, href: undefined },
+  ];
+
   return (
-    <section id="contact" className="relative py-24 md:py-36">
+    <section
+      id="contact"
+      className="relative py-24 transition-opacity duration-500 md:py-36"
+      style={{ opacity: loading ? 0.4 : 1 }}
+    >
       <div className="mx-auto max-w-7xl px-6">
         <Reveal>
           <div className="relative overflow-hidden rounded-[2.5rem] bg-ink p-8 shadow-[0_40px_120px_rgba(11,11,20,0.35)] md:p-14 lg:p-20">
-            {/* animated gradient auras */}
             <motion.div
               className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-aqua/50 blur-[130px]"
               animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
@@ -111,7 +122,6 @@ export default function Contact() {
             <div className="bg-grid absolute inset-0 opacity-[0.35] [background-image:linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]" />
 
             <div className="relative grid gap-14 lg:grid-cols-[1.1fr_0.9fr]">
-              {/* Left */}
               <div>
                 <div className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur-sm">
                   <span className="relative flex h-2 w-2">
@@ -154,8 +164,15 @@ export default function Contact() {
                 </div>
 
                 <div className="mt-10 flex gap-3">
-                  {SOCIALS.map(({ label, href, icon }) => {
-                    const Icon = icon === "github" ? GithubIcon : icon === "linkedin" ? LinkedinIcon : icon === "facebook" ? FacebookIcon : InstagramIcon;
+                  {contact.socials.map(({ label, href, icon }) => {
+                    const Icon =
+                      icon === "github"
+                        ? GithubIcon
+                        : icon === "linkedin"
+                        ? LinkedinIcon
+                        : icon === "facebook"
+                        ? FacebookIcon
+                        : InstagramIcon;
                     return (
                       <Magnetic key={label} strength={0.4}>
                         <a
@@ -174,7 +191,6 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Right — form card */}
               <div className="rounded-[1.75rem] border border-white/15 bg-white p-6 text-ink shadow-2xl md:p-8">
                 <h3 className="font-display text-2xl font-semibold tracking-tight">
                   Send me a message
@@ -209,8 +225,8 @@ export default function Contact() {
                   {error && (
                     <p className="text-center text-sm font-medium text-red-500">
                       Something went wrong. Please try again or email me directly at{" "}
-                      <a href="mailto:ahmadrao3226@gmail.com" className="underline">
-                        ahmadrao3226@gmail.com
+                      <a href={`mailto:${contact.email}`} className="underline">
+                        {contact.email}
                       </a>
                       .
                     </p>
