@@ -51,10 +51,12 @@ export default function About() {
 
   const words = about.paragraph.split(" ").filter(Boolean);
 
-  if (loading) return null;
-
   return (
-    <section id="about" className="relative overflow-hidden py-24 md:py-36">
+    <section
+      id="about"
+      className="relative overflow-hidden py-24 transition-opacity duration-500 md:py-36"
+      style={{ opacity: loading ? 0.4 : 1 }}
+    >
       <div className="pointer-events-none absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-aqua/15 blur-[110px]" />
 
       <div className="relative mx-auto max-w-7xl px-6">
@@ -70,7 +72,7 @@ export default function About() {
             <Word
               key={i}
               progress={scrollYProgress}
-              range={[i / words.length, (i + 1) / words.length]}
+              range={[i / (words.length || 1), (i + 1) / (words.length || 1)]}
             >
               {word}
             </Word>
