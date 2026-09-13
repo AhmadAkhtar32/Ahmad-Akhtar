@@ -42,14 +42,10 @@
     border: 2px solid #f1f0f7;
   }
   @media (pointer: fine) {
-    html,
-    body,
-    a,
-    button,
-    [data-hover] {
-      cursor: none;
-    }
+  html, body, a, button, [data-hover], * {
+    cursor: none;
   }
+}
 }
 
 /* ---------- Film grain ---------- */
