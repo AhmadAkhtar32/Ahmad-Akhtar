@@ -9,8 +9,8 @@ export default function Cursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const ringX = useSpring(x, { stiffness: 420, damping: 38, mass: 0.7 });
-  const ringY = useSpring(y, { stiffness: 420, damping: 38, mass: 0.7 });
+  const dotX = useSpring(x, { stiffness: 500, damping: 40, mass: 0.5 });
+  const dotY = useSpring(y, { stiffness: 500, damping: 40, mass: 0.5 });
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -39,31 +39,22 @@ export default function Cursor() {
   if (!enabled) return null;
 
   return (
-    <>
-      {/* dot */}
-      <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[95] h-2 w-2 rounded-full bg-aqua"
-        style={{ x, y, translateX: "-50%", translateY: "-50%" }}
-        animate={variant}
-        variants={{
-          default: { scale: 1, opacity: 1 },
-          hover: { scale: 0.6, opacity: 1 },
-          hidden: { opacity: 0 },
-        }}
-        transition={{ duration: 0.2 }}
-      />
-      {/* trailing ring */}
-      <motion.div
-        className="pointer-events-none fixed left-0 top-0 z-[94] h-9 w-9 rounded-full border-[1.5px] border-aqua/70"
-        style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
-        animate={variant}
-        variants={{
-          default: { scale: 1, opacity: 0.9, backgroundColor: "rgba(34,195,230,0)" },
-          hover: { scale: 1.9, opacity: 1, backgroundColor: "rgba(34,195,230,0.08)" },
-          hidden: { opacity: 0, scale: 0.6 },
-        }}
-        transition={{ duration: 0.28, ease: "easeOut" }}
-      />
-    </>
+    <motion.div
+      className="pointer-events-none fixed left-0 top-0 z-[95] h-3 w-3 rounded-full"
+      style={{
+        x: dotX,
+        y: dotY,
+        translateX: "-50%",
+        translateY: "-50%",
+        background: "linear-gradient(135deg, #22c3e6, #14b86a, #ff6b4a)",
+      }}
+      animate={variant}
+      variants={{
+        default: { scale: 1, opacity: 1 },
+        hover: { scale: 2.2, opacity: 0.85 },
+        hidden: { opacity: 0, scale: 0.4 },
+      }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    />
   );
 }
