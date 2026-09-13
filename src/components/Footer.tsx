@@ -74,7 +74,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink-soft">
-              Software engineer from Lahore, Pakistan — building scalable applications, AI/ML
+              Software engineer from Lahore Pakistan. building scalable applications, AI/ML
               tools, and exploring machine learning with Python and modern frameworks.
             </p>
             <div className="mt-7 flex gap-3">

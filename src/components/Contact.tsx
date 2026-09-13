@@ -137,7 +137,7 @@ export default function Contact() {
                   Let&apos;s build something <span className="text-gradient-prism">amazing.</span>
                 </h2>
                 <p className="mt-6 max-w-md text-[15px] leading-relaxed text-white/70">
-                  Got a project, idea, or problem to solve? Drop me a message — I&apos;ll get back to
+                  Got a project, idea, or problem to solve? Drop me a message. I&apos;ll get back to
                   you within a day.
                 </p>
 
@@ -196,7 +196,7 @@ export default function Contact() {
                   Send me a message
                 </h3>
                 <p className="mt-1.5 text-sm text-ink-soft">
-                  It lands straight in my inbox — no spam, ever.
+                  It lands straight in my inbox. No spam, ever.
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-7 space-y-4">

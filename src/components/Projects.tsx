@@ -40,7 +40,7 @@ export default function Projects() {
           </div>
           <Reveal delay={0.15}>
             <p className="max-w-sm text-[15px] leading-relaxed text-ink-soft">
-              A selection of projects I&apos;ve built — from personal experiments to full-stack
+              A selection of projects I&apos;ve built, from personal experiments to full-stack
               applications.
             </p>
           </Reveal>
